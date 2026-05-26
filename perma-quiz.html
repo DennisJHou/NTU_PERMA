@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PERMA 幸福感測驗</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=DM+Serif+Display&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --sage: #4a7c6f;
+    --sage-light: #7aab9c;
+    --sage-pale: #e8f2ef;
+    --sage-deep: #2d5a4f;
+    --warm: #c9a96e;
+    --warm-light: #f0e4cc;
+    --ink: #1a1a1a;
+    --ink-soft: #4a4a4a;
+    --ink-muted: #8a8a8a;
+    --paper: #faf8f4;
+    --white: #ffffff;
+    --border: #e2ddd6;
+    --P: #4a7c6f;
+    --E: #5b6fa8;
+    --R: #a0704a;
+    --M: #7a5498;
+    --A: #a05870;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    font-weight: 300;
+    line-height: 1.8;
+  }
+
+  /* LANDING */
+  #landing {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #landing::before {
+    content: '';
+    position: fixed;
+    top: -30%;
+    right: -20%;
+    width: 60vw;
+    height: 60vw;
+    background: radial-gradient(circle, rgba(74,124,111,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  #landing::after {
+    content: '';
+    position: fixed;
+    bottom: -20%;
+    left: -15%;
+    width: 50vw;
+    height: 50vw;
+    background: radial-gradient(circle, rgba(201,169,110,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .landing-inner {
+    max-width: 560px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sage);
+    border: 1px solid var(--sage-light);
+    padding: 5px 16px;
+    border-radius: 99px;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: riseIn 0.6s ease 0.1s forwards;
+  }
+
+  .landing-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.8rem, 8vw, 4.5rem);
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    opacity: 0;
+    animation: riseIn 0.7s ease 0.25s forwards;
+  }
+
+  .landing-title span {
+    color: var(--sage);
+    display: block;
+  }
+
+  .landing-desc {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    max-width: 420px;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0;
+    animation: riseIn 0.7s ease 0.4s forwards;
+  }
+
+  .perma-pills {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: riseIn 0.7s ease 0.55s forwards;
+  }
+
+  .pill {
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: 99px;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+  }
+
+  .pill-P { background: rgba(74,124,111,0.1); color: var(--P); }
+  .pill-E { background: rgba(91,111,168,0.1); color: var(--E); }
+  .pill-R { background: rgba(160,112,74,0.1); color: var(--R); }
+  .pill-M { background: rgba(122,84,152,0.1); color: var(--M); }
+  .pill-A { background: rgba(160,88,112,0.1); color: var(--A); }
+
+  .btn-start {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--sage-deep);
+    color: var(--white);
+    border: none;
+    padding: 15px 36px;
+    font-size: 15px;
+    font-family: 'Noto Sans TC', sans-serif;
+    font-weight: 400;
+    border-radius: 99px;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    box-shadow: 0 4px 24px rgba(45,90,79,0.25);
+    opacity: 0;
+    animation: riseIn 0.7s ease 0.7s forwards;
+  }
+
+  .btn-start:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(45,90,79,0.3);
+    background: var(--sage);
+  }
+
+  .btn-start svg { width: 16px; height: 16px; }
+
+  .note {
+    margin-top: 1.5rem;
+    font-size: 12px;
+    color: var(--ink-muted);
+    opacity: 0;
+    animation: riseIn 0.7s ease 0.85s forwards;
+  }
+
+  /* QUIZ */
+  #quiz {
+    display: none;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .quiz-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    min-height: 100vh;
+  }
+
+  .quiz-sidebar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sidebar-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--sage-deep);
+  }
+
+  .progress-info {
+    font-size: 13px;
+    color: var(--ink-muted);
+  }
+
+  .quiz-main {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+    min-height: calc(100vh - 70px);
+  }
+
+  .question-card {
+    max-width: 620px;
+    width: 100%;
+  }
+
+  .q-dim-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    font-weight: 400;
+  }
+
+  .dim-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .q-number {
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .q-text {
+    font-family: 'Noto Serif TC', serif;
+    font-size: clamp(1.1rem, 3vw, 1.4rem);
+    line-height: 1.7;
+    color: var(--ink);
+    margin-bottom: 2.5rem;
+    font-weight: 300;
+  }
+
+  .scale-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1rem;
+  }
+
+  .scale-option {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  .scale-option input[type="radio"] { display: none; }
+
+  .scale-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--ink-muted);
+    transition: all 0.18s ease;
+    cursor: pointer;
+    position: relative;
+    font-family: 'Noto Serif TC', serif;
+  }
+
+  .scale-option:hover .scale-circle {
+    border-color: var(--current-dim, var(--sage));
+    color: var(--current-dim, var(--sage));
+    background: rgba(74,124,111,0.04);
+    transform: scale(1.05);
+  }
+
+  .scale-option input:checked ~ .scale-circle {
+    background: var(--current-dim, var(--sage));
+    border-color: var(--current-dim, var(--sage));
+    color: var(--white);
+    transform: scale(1.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+
+  .scale-label {
+    font-size: 11px;
+    color: var(--ink-muted);
+    text-align: center;
+  }
+
+  .scale-endpoints {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-bottom: 2.5rem;
+    padding: 0 4px;
+  }
+
+  .quiz-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .btn-prev {
+    background: none;
+    border: 1px solid var(--border);
+    padding: 10px 22px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-family: 'Noto Sans TC', sans-serif;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-prev:hover { border-color: var(--ink-soft); }
+  .btn-prev:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .btn-next-quiz {
+    background: var(--current-dim, var(--sage-deep));
+    color: var(--white);
+    border: none;
+    padding: 12px 30px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    transition: all 0.18s;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+
+  .btn-next-quiz.ready {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .btn-next-quiz.ready:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+  .progress-track {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--border);
+    z-index: 100;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--current-dim, var(--sage));
+    transition: width 0.4s ease, background 0.4s ease;
+  }
+
+  /* RESULTS */
+  #results {
+    display: none;
+    min-height: 100vh;
+    background: var(--paper);
+  }
+
+  .results-hero {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    padding: 4rem 1.5rem 3rem;
+    text-align: center;
+  }
+
+  .results-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 1rem;
+  }
+
+  .results-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    margin-bottom: 0.5rem;
+    color: var(--ink);
+  }
+
+  .results-total {
+    font-size: 14px;
+    color: var(--ink-muted);
+    margin-bottom: 2rem;
+  }
+
+  .total-score-wrap {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
+    margin-bottom: 0.5rem;
+  }
+
+  .total-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 4rem;
+    color: var(--sage-deep);
+    line-height: 1;
+  }
+
+  .total-denom {
+    font-size: 18px;
+    color: var(--ink-muted);
+  }
+
+  .total-label {
+    font-size: 13px;
+    color: var(--ink-muted);
+    margin-bottom: 2rem;
+  }
+
+  .radar-wrap {
+    max-width: 300px;
+    margin: 0 auto 1rem;
+  }
+
+  .results-body {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem;
+  }
+
+  .section-label {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.75rem;
+  }
+
+  .dim-result-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dim-result-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: var(--card-color);
+    border-radius: 4px 0 0 4px;
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+  }
+
+  .card-name {
+    font-family: 'Noto Serif TC', serif;
+    font-size: 18px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+
+  .card-en {
+    font-size: 12px;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+  }
+
+  .card-score {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem;
+    line-height: 1;
+    color: var(--card-color);
+  }
+
+  .card-score span {
+    font-size: 14px;
+    color: var(--ink-muted);
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+
+  .score-bar-bg {
+    height: 6px;
+    background: #f0ede8;
+    border-radius: 99px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: var(--card-color);
+    transition: width 1s ease;
+  }
+
+  .level-badge {
+    display: inline-block;
+    font-size: 11px;
+    padding: 3px 12px;
+    border-radius: 99px;
+    margin-bottom: 0.75rem;
+    font-weight: 400;
+  }
+
+  .card-desc {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.8;
+  }
+
+  .card-tip {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--tip-bg, #f5f2ee);
+    border-radius: 8px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+  }
+
+  .restart-section {
+    text-align: center;
+    padding: 2rem 0 4rem;
+    border-top: 1px solid var(--border);
+    margin-top: 1rem;
+  }
+
+  .btn-restart {
+    background: none;
+    border: 1.5px solid var(--sage);
+    color: var(--sage-deep);
+    padding: 13px 32px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-restart:hover {
+    background: var(--sage);
+    color: var(--white);
+    transform: translateY(-2px);
+  }
+
+  @keyframes riseIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .fade-up {
+    opacity: 0;
+    animation: riseIn 0.5s ease forwards;
+  }
+
+  @media (max-width: 480px) {
+    .scale-circle { width: 44px; height: 44px; font-size: 13px; }
+    .scale-container { gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<section id="landing">
+  <div class="landing-inner">
+    <div class="badge">Butler & Kern, 2016</div>
+    <h1 class="landing-title">PERMA<span>幸福感測驗</span></h1>
+    <p class="landing-desc">
+      透過 15 道問題，探索你在正向情緒、全心投入、人際關係、生活意義與成就感五個向度的幸福輪廓。
+    </p>
+    <div class="perma-pills">
+      <span class="pill pill-P">正向情緒</span>
+      <span class="pill pill-E">全心投入</span>
+      <span class="pill pill-R">人際關係</span>
+      <span class="pill pill-M">生活意義</span>
+      <span class="pill pill-A">成就感</span>
+    </div>
+    <button class="btn-start" onclick="startQuiz()">
+      開始測驗
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M3 8h10M9 4l4 4-4 4"/>
+      </svg>
+    </button>
+    <p class="note">約需 3 分鐘 · 共 15 題 · 無需登入</p>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz">
+  <div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+  <div class="quiz-sidebar">
+    <div class="sidebar-logo">PERMA</div>
+    <div class="progress-info" id="prog-info">第 1 題，共 15 題</div>
+  </div>
+  <div class="quiz-main">
+    <div class="question-card" id="question-card">
+      <!-- injected by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section id="results">
+  <div class="results-hero">
+    <div class="results-eyebrow">你的幸福輪廓</div>
+    <h2 class="results-title">測驗結果</h2>
+    <div class="total-score-wrap">
+      <div class="total-num" id="res-total">—</div>
+      <div class="total-denom">/ 5</div>
+    </div>
+    <div class="total-label">整體幸福感平均分</div>
+    <div class="results-total" id="res-summary"></div>
+    <div class="radar-wrap">
+      <canvas id="radar-chart" width="300" height="300"></canvas>
+    </div>
+  </div>
+  <div class="results-body">
+    <div class="section-label">各向度詳細分析</div>
+    <div id="dim-cards"></div>
+    <div class="restart-section">
+      <button class="btn-restart" onclick="restart()">重新測驗</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const DIMS = {
+  P: { label: '正向情緒', en: 'Positive Emotion', color: '#4a7c6f' },
+  E: { label: '全心投入', en: 'Engagement',       color: '#5b6fa8' },
+  R: { label: '與他人關係', en: 'Relationships',  color: '#a0704a' },
+  M: { label: '生活意義', en: 'Meaning',          color: '#7a5498' },
+  A: { label: '成就感', en: 'Accomplishment',     color: '#a05870' },
+};
+
+const QUESTIONS = [
+  { dim:'P', text:'一般而言，你有多常感到愉悅？' },
+  { dim:'P', text:'一般而言，你有多常感到正向？' },
+  { dim:'P', text:'一般而言，你感到滿足的程度是？' },
+  { dim:'E', text:'你有多常能夠全心投入你正在進行的事件中？' },
+  { dim:'E', text:'一般而言，在事物上你感到興奮和有趣的程度是？' },
+  { dim:'E', text:'你有多常投入在做你感到愉悅的事時忘掉時間？' },
+  { dim:'R', text:'當你需要時，你從他人獲得幫助和支持的程度是？' },
+  { dim:'R', text:'你感到被愛的程度是？' },
+  { dim:'R', text:'你對自己的人際關係感到滿意的程度是？' },
+  { dim:'M', text:'一般而言，你目前有多大的程度認為自己正在過著有目的且具意義的生活？' },
+  { dim:'M', text:'一般而言，你感到在生活中所做的是有價值且值得的程度是？' },
+  { dim:'M', text:'你通常覺得自己生活有方向感的程度是？' },
+  { dim:'A', text:'有多少的時間你認為自己正在往要完成的目標前進？' },
+  { dim:'A', text:'你有多常完成你為自己所設定的重要目標？' },
+  { dim:'A', text:'你有多常能夠掌握並處理好自己的責任？' },
+];
+
+const SCALE = [
+  { value: 1, label: '幾乎沒有' },
+  { value: 2, label: '偶爾' },
+  { value: 3, label: '有時候' },
+  { value: 4, label: '經常' },
+  { value: 5, label: '非常頻繁' },
+];
+
+const DESCS = {
+  P: {
+    low:  { title:'偏低', desc:'你目前的正向情緒較少，生活中的喜悅感可能不夠充沛。試著每天記錄一件讓你微笑的小事，培養感恩的習慣可以逐漸改變你的情緒基調。', tip:'💡 建議：嘗試「感恩日記」，每晚寫下三件今天發生的好事。' },
+    mid:  { title:'中等', desc:'你有一定的正向情緒基礎，但仍有提升的空間。留意那些讓你感到快樂的活動與人際關係，有意識地增加這些時光。', tip:'💡 建議：每週安排一項你真正喜歡的活動，不要讓它消失在忙碌中。' },
+    high: { title:'豐沛', desc:'你擁有豐沛的正向情緒！生活中你能感受到許多喜悅與滿足，這是心理健康的重要基礎。繼續滋養這份能量，也可以與身邊的人分享。', tip:'💡 建議：把這份積極的能量傳遞出去，幫助身邊的人感受到更多正向時刻。' },
+  },
+  E: {
+    low:  { title:'偏低', desc:'你目前較難進入全心投入的狀態，可能感到做事提不起勁或容易分心。嘗試找出讓你能「忘我」的活動，即使每天只有短短15分鐘也很有價值。', tip:'💡 建議：嘗試找出一項讓你進入「心流」的活動，排除干擾專注投入。' },
+    mid:  { title:'中等', desc:'你有時能夠全心投入，但並不穩定。探索哪些情境讓你最容易忘我，是工作、興趣還是某種創作？有意識地創造更多這類機會。', tip:'💡 建議：辨識讓你投入的條件（安靜？挑戰性？），並主動重現這些條件。' },
+    high: { title:'充沛', desc:'你非常善於全心投入！你經常能進入心流狀態，做事時充滿專注與活力。這種能力是幸福感的重要來源，好好珍惜並繼續培養。', tip:'💡 建議：你的心流能力很強，試著把這個特質帶入更多生活領域。' },
+  },
+  R: {
+    low:  { title:'偏低', desc:'你目前的社交支持感較低，可能感到孤立或缺乏深度連結。主動聯繫一位久未見面的朋友，或加入一個興趣社群，從小步開始建立連結。', tip:'💡 建議：本週主動聯繫一位你想念的人，哪怕只是傳一則簡訊。' },
+    mid:  { title:'中等', desc:'你有一些重要的人際連結，但深度或廣度可能仍有不足。深化現有的關係往往比廣泛社交更有益——試著定期安排深度對話的時間。', tip:'💡 建議：與你最在乎的一兩個人，安排一次真正能深聊的時光。' },
+    high: { title:'豐富', desc:'你擁有豐富且充實的人際關係！你感受到來自他人的愛與支持，這是幸福感最重要的支柱之一。繼續滋養這些珍貴的連結。', tip:'💡 建議：好好珍惜這些關係，並在他人需要時給予同等的支持回饋。' },
+  },
+  M: {
+    low:  { title:'偏低', desc:'你目前對生活意義的感受較低，可能感到迷失方向或不確定自己在做的事是否有價值。花時間思考什麼對你真正重要，從小處找到意義的起點。', tip:'💡 建議：做一件對他人有益的小事，哪怕只是幫助一個陌生人。' },
+    mid:  { title:'中等', desc:'你有一定的意義感，但可能尚未與更深層的價值完全連結。試著問自己「這對我為什麼重要？」，把日常活動連結到你真正在乎的事物。', tip:'💡 建議：花15分鐘寫下你認為生命中最重要的三件事，並思考日常如何體現它們。' },
+    high: { title:'強烈', desc:'你有強烈的生活目的感！你清楚自己為何而活，所做的事對你而言充滿價值與方向。這是心理健康最深厚的保護因子之一。', tip:'💡 建議：試著把你的意義感分享給身邊的人，你的清晰方向可能激勵到他們。' },
+  },
+  A: {
+    low:  { title:'偏低', desc:'你目前的成就感偏低，可能感到目標難以達成或對自己的進步感到懷疑。設定一個本週就能完成的小目標，從成功的小循環中重建自信。', tip:'💡 建議：把大目標拆解成今天就能做的一個小步驟，完成它。' },
+    mid:  { title:'中等', desc:'你有一定的成就感基礎，但可能目標設定或追蹤上還不夠清晰。為自己設定更具體的目標，並記得慶祝每一個完成的里程碑。', tip:'💡 建議：試試「每週回顧」，記錄你這週完成了什麼，讓進步變得可見。' },
+    high: { title:'卓越', desc:'你的成就感很強！你善於設定並達成目標，對自己的責任感有清晰的掌握。這種持續前進的動力是你幸福感的重要動能。', tip:'💡 建議：你的執行力很強，不妨也帶領或鼓勵身邊的人一起設定目標、互相支持。' },
+  },
+};
+
+let current = 0;
+let answers = new Array(15).fill(null);
+
+function startQuiz() {
+  document.getElementById('landing').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  renderQuestion(0);
+}
+
+function getDimColor(dim) {
+  return DIMS[dim].color;
+}
+
+function renderQuestion(idx) {
+  const q = QUESTIONS[idx];
+  const color = getDimColor(q.dim);
+  const card = document.getElementById('question-card');
+
+  document.getElementById('prog-info').textContent = `第 ${idx+1} 題，共 15 題`;
+  document.getElementById('prog-fill').style.width = ((idx / 15) * 100) + '%';
+  document.getElementById('prog-fill').style.background = color;
+  document.documentElement.style.setProperty('--current-dim', color);
+
+  const saved = answers[idx];
+  let scaleHTML = SCALE.map(s => `
+    <label class="scale-option">
+      <input type="radio" name="q${idx}" value="${s.value}" ${saved === s.value ? 'checked' : ''}>
+      <div class="scale-circle" style="${saved === s.value ? `background:${color};border-color:${color};color:#fff` : ''}">${s.value}</div>
+      <div class="scale-label">${s.label}</div>
+    </label>
+  `).join('');
+
+  card.innerHTML = `
+    <div class="fade-up">
+      <div class="q-dim-tag" style="color:${color}">
+        <span class="dim-dot" style="background:${color}"></span>
+        ${DIMS[q.dim].label} &middot; ${DIMS[q.dim].en}
+      </div>
+      <div class="q-number">問題 ${idx+1}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="scale-container" id="scale-row">${scaleHTML}</div>
+      <div class="scale-endpoints">
+        <span>1 · 幾乎沒有</span>
+        <span>5 · 非常頻繁</span>
+      </div>
+      <div class="quiz-nav">
+        <button class="btn-prev" onclick="prevQ()" ${idx === 0 ? 'disabled' : ''}>← 上一題</button>
+        <button class="btn-next-quiz ${saved !== null ? 'ready' : ''}" id="btn-next" onclick="nextQ()" style="background:${color}">
+          ${idx === 14 ? '查看結果 →' : '下一題 →'}
+        </button>
+      </div>
+    </div>
+  `;
+
+  card.querySelectorAll('input[type=radio]').forEach(r => {
+    r.addEventListener('change', (e) => {
+      answers[idx] = parseInt(e.target.value);
+      card.querySelectorAll('.scale-circle').forEach((c, i) => {
+        c.style.background = '';
+        c.style.borderColor = '';
+        c.style.color = '';
+      });
+      const selected = card.querySelectorAll('.scale-option')[parseInt(e.target.value) - 1];
+      const circ = selected.querySelector('.scale-circle');
+      circ.style.background = color;
+      circ.style.borderColor = color;
+      circ.style.color = '#fff';
+      document.getElementById('btn-next').classList.add('ready');
+    });
+  });
+}
+
+function prevQ() {
+  if (current > 0) { current--; renderQuestion(current); }
+}
+
+function nextQ() {
+  if (answers[current] === null) return;
+  if (current < 14) { current++; renderQuestion(current); }
+  else showResults();
+}
+
+function getLevel(score) {
+  if (score <= 2.4) return 'low';
+  if (score <= 3.6) return 'mid';
+  return 'high';
+}
+
+function getLevelLabel(l) { return {low:'偏低',mid:'中等',high:'高'}[l]; }
+
+function showResults() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+
+  const scores = {};
+  ['P','E','R','M','A'].forEach(d => {
+    const qs = QUESTIONS.map((q,i)=>({...q,i})).filter(q=>q.dim===d);
+    scores[d] = parseFloat((qs.reduce((s,q)=>s+answers[q.i],0)/3).toFixed(2));
+  });
+
+  const total = parseFloat((Object.values(scores).reduce((a,b)=>a+b,0)/5).toFixed(1));
+  document.getElementById('res-total').textContent = total.toFixed(1);
+
+  const summaries = { low:'整體幸福感目前偏低。透過各向度的意識改善，可以逐步建立更充實的生活。', mid:'你的整體幸福感在中等水平。持續耕耘每個向度，可帶來顯著且持久的提升。', high:'你的整體幸福感相當高！保持這些讓你茁壯成長的習慣、關係與活動。' };
+  const totalLevel = total <= 2.4 ? 'low' : total <= 3.6 ? 'mid' : 'high';
+  document.getElementById('res-summary').textContent = summaries[totalLevel];
+
+  const cardsEl = document.getElementById('dim-cards');
+  cardsEl.innerHTML = '';
+  ['P','E','R','M','A'].forEach((d, i) => {
+    const score = scores[d];
+    const lvl = getLevel(score);
+    const dim = DIMS[d];
+    const desc = DESCS[d][lvl];
+    const pct = (score / 5) * 100;
+    const badgeColors = { low: '#fdecea;color:#9b3a34', mid: '#fef6e4;color:#7a5c1e', high: '#e8f5ee;color:#2d6a4f' };
+    const tipBg = { low: '#fef5f4', mid: '#fefaf0', high: '#f0f7f4' };
+    const card = document.createElement('div');
+    card.className = 'dim-result-card fade-up';
+    card.style.cssText = `--card-color:${dim.color}; --tip-bg:${tipBg[lvl]}; animation-delay:${i*0.12}s`;
+    card.innerHTML = `
+      <div class="card-top">
+        <div>
+          <div class="card-name">${dim.label}</div>
+          <div class="card-en">${dim.en}</div>
+        </div>
+        <div class="card-score">${score.toFixed(1)}<span> / 5</span></div>
+      </div>
+      <div class="score-bar-bg"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+      <div class="level-badge" style="background:${badgeColors[lvl].split(';')[0]};color:${badgeColors[lvl].split('color:')[1]}">${desc.title}</div>
+      <div class="card-desc">${desc.desc}</div>
+      <div class="card-tip">${desc.tip}</div>
+    `;
+    cardsEl.appendChild(card);
+  });
+
+  drawRadar(scores);
+  window.scrollTo(0,0);
+}
+
+function drawRadar(scores) {
+  const canvas = document.getElementById('radar-chart');
+  const ctx = canvas.getContext('2d');
+  const cx = 150, cy = 150, R = 110;
+  const labels = ['P','E','R','M','A'];
+  const colors = labels.map(d => DIMS[d].color);
+  const vals = labels.map(d => scores[d] / 5);
+  const N = 5;
+
+  ctx.clearRect(0,0,300,300);
+
+  for (let ring = 1; ring <= 5; ring++) {
+    ctx.beginPath();
+    for (let i = 0; i < N; i++) {
+      const angle = (Math.PI * 2 * i / N) - Math.PI / 2;
+      const r = R * ring / 5;
+      const x = cx + r * Math.cos(angle);
+      const y = cy + r * Math.sin(angle);
+      i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  for (let i = 0; i < N; i++) {
+    const angle = (Math.PI * 2 * i / N) - Math.PI / 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + R * Math.cos(angle), cy + R * Math.sin(angle));
+    ctx.strokeStyle = 'rgba(0,0,0,0.1)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+
+  ctx.beginPath();
+  vals.forEach((v, i) => {
+    const angle = (Math.PI * 2 * i / N) - Math.PI / 2;
+    const r = R * v;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(74,124,111,0.15)';
+  ctx.fill();
+  ctx.strokeStyle = '#4a7c6f';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  labels.forEach((d, i) => {
+    const angle = (Math.PI * 2 * i / N) - Math.PI / 2;
+    const lx = cx + (R + 22) * Math.cos(angle);
+    const ly = cy + (R + 22) * Math.sin(angle);
+    ctx.fillStyle = DIMS[d].color;
+    ctx.font = '500 12px "Noto Sans TC", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(DIMS[d].label, lx, ly);
+  });
+
+  vals.forEach((v, i) => {
+    const angle = (Math.PI * 2 * i / N) - Math.PI / 2;
+    const r = R * v;
+    const x = cx + r * Math.cos(angle);
+    const y = cy + r * Math.sin(angle);
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+  });
+}
+
+function restart() {
+  current = 0;
+  answers = new Array(15).fill(null);
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('landing').style.display = 'flex';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
