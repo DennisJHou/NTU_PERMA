@@ -580,6 +580,104 @@
     transform: translateY(-2px);
   }
 
+  /* EMAIL SCREEN */
+  #email-screen {
+    display: none;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+  }
+
+  .email-card {
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .email-icon {
+    width: 56px; height: 56px;
+    background: var(--sage-pale);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 1.5rem;
+  }
+
+  .email-icon svg { width: 24px; height: 24px; stroke: var(--sage-deep); }
+
+  .email-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  .email-desc {
+    font-size: 14px;
+    color: var(--ink-muted);
+    margin-bottom: 2rem;
+    line-height: 1.7;
+  }
+
+  .email-input-wrap {
+    position: relative;
+    margin-bottom: 1rem;
+  }
+
+  .email-input {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 15px;
+    font-family: 'Noto Sans TC', sans-serif;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: var(--white);
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .email-input:focus { border-color: var(--sage); }
+  .email-input.error { border-color: #c0392b; }
+
+  .email-error {
+    font-size: 12px;
+    color: #c0392b;
+    margin-top: 6px;
+    display: none;
+    text-align: left;
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: var(--sage-deep);
+    color: var(--white);
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: 'Noto Sans TC', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 0.75rem;
+  }
+
+  .btn-submit:hover { background: var(--sage); transform: translateY(-1px); }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  .btn-skip {
+    background: none;
+    border: none;
+    font-size: 13px;
+    color: var(--ink-muted);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+
+  .btn-skip:hover { color: var(--ink-soft); }
+
   @keyframes riseIn {
     from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
@@ -634,6 +732,24 @@
     <div class="question-card" id="question-card">
       <!-- injected by JS -->
     </div>
+  </div>
+</section>
+
+<!-- EMAIL -->
+<section id="email-screen">
+  <div class="email-card">
+    <div class="email-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:24px;height:24px;stroke:#2d5a4f"><rect x="2" y="4" width="20" height="16" rx="3"/><path d="M2 7l10 7 10-7"/></svg>
+    </div>
+    <div class="email-title">最後一步</div>
+    <div class="email-desc">留下你的 Email，我們會將你的測驗結果寄給你，方便日後回顧。</div>
+    <div class="email-input-wrap">
+      <input class="email-input" type="email" id="email-input" placeholder="your@email.com">
+      <div class="email-error" id="email-error">請輸入有效的 Email 地址</div>
+    </div>
+    <button class="btn-submit" id="btn-submit" onclick="submitAndShowResults()">查看我的結果</button>
+    <br><br>
+    <button class="btn-skip" onclick="submitAndShowResults(true)">略過，直接查看結果</button>
   </div>
 </section>
 
@@ -800,10 +916,54 @@ function prevQ() {
   if (current > 0) { current--; renderQuestion(current); }
 }
 
+const APPS_SCRIPT_URL = '請貼上你的_APPS_SCRIPT_URL';
+
 function nextQ() {
   if (answers[current] === null) return;
   if (current < 14) { current++; renderQuestion(current); }
-  else showResults();
+  else showEmailScreen();
+}
+
+function showEmailScreen() {
+  document.getElementById('quiz').style.display = 'none';
+  document.getElementById('email-screen').style.display = 'flex';
+  window.scrollTo(0,0);
+}
+
+function submitAndShowResults(skip) {
+  const emailInput = document.getElementById('email-input');
+  const emailError = document.getElementById('email-error');
+  const email = emailInput ? emailInput.value.trim() : '';
+
+  if (!skip) {
+    const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    if (!valid) {
+      emailInput.classList.add('error');
+      emailError.style.display = 'block';
+      return;
+    }
+    emailInput.classList.remove('error');
+    emailError.style.display = 'none';
+  }
+
+  const scores = {};
+  ['P','E','R','M','A'].forEach(d => {
+    const qs = QUESTIONS.map((q,i)=>({...q,i})).filter(q=>q.dim===d);
+    scores[d] = parseFloat((qs.reduce((s,q)=>s+answers[q.i],0)/3).toFixed(2));
+  });
+  const total = parseFloat((Object.values(scores).reduce((a,b)=>a+b,0)/5).toFixed(1));
+
+  if (APPS_SCRIPT_URL !== '請貼上你的_APPS_SCRIPT_URL') {
+    fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: skip ? '(略過)' : email, P: scores.P, E: scores.E, R: scores.R, M: scores.M, A: scores.A, total }),
+    }).catch(() => {});
+  }
+
+  document.getElementById('email-screen').style.display = 'none';
+  showResults();
 }
 
 function getLevel(score) {
@@ -815,7 +975,6 @@ function getLevel(score) {
 function getLevelLabel(l) { return {low:'偏低',mid:'中等',high:'高'}[l]; }
 
 function showResults() {
-  document.getElementById('quiz').style.display = 'none';
   document.getElementById('results').style.display = 'block';
 
   const scores = {};
@@ -942,6 +1101,7 @@ function restart() {
   current = 0;
   answers = new Array(15).fill(null);
   document.getElementById('results').style.display = 'none';
+  document.getElementById('email-screen').style.display = 'none';
   document.getElementById('landing').style.display = 'flex';
   window.scrollTo(0,0);
 }
